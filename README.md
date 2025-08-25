@@ -93,4 +93,4 @@ MIT License © 2025 Bernhard Reitinger
 
 - Built with FastAPI + OpenCV
 - Uses uv for dependency management
-- Integrates with Prusa Connect Camera API
+- Integrates with Prusa Connect Camera API ([https://connect.prusa3d.com/docs/cameras/openapi/])
