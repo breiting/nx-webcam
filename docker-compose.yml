@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  nx-webcam:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nx-webcam
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000" # http://localhost:8000
+    devices:
+      - "/dev/video0:/dev/video0" # ggf. weitere /dev/videoX mappen
+    # Zugriff auf Videogruppe (hostabhängig). Auf vielen Systemen ist "video" GID 44.
+    group_add:
+      - "video"
+    # Wenn dein System restriktiv ist, kann das helfen:
+    # security_opt:
+    #   - seccomp:unconfined
+    # privileged: true   # nur wenn unbedingt nötig
