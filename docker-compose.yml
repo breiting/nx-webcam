@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   nx-webcam:
+    image: nx-webcam:latest
     build:
       context: .
       dockerfile: Dockerfile
