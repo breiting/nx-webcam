@@ -1,4 +1,8 @@
-import os, time, threading, cv2, requests
+import os
+import time
+import threading
+import cv2
+import requests
 from fastapi import FastAPI, Response
 from starlette.responses import StreamingResponse
 
@@ -34,9 +38,7 @@ def open_capture() -> cv2.VideoCapture:
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
             cap.set(cv2.CAP_PROP_FPS, FPS)
     if not cap.isOpened():
-        raise RuntimeError(
-            "Kamera konnte nicht geöffnet werden (GStreamer und V4L2 fehlgeschlagen)."
-        )
+        raise RuntimeError("Could not open camera.")
     return cap
 
 
