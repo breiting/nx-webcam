@@ -35,7 +35,7 @@ logging.basicConfig(
     level=LOG_LEVEL,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
-log = logging.getLogger("printer-cam")
+log = logging.getLogger("nx-webcam")
 
 # -------------------------
 # App State
@@ -141,19 +141,19 @@ def grabber_worker():
 
 def prusa_pusher_worker():
     if not PRUSA_TOKEN or not PRUSA_FINGERPRINT:
-        log.info(
-            "PRUSA_TOKEN oder PRUSA_FINGERPRINT nicht gesetzt – Prusa-Upload ist deaktiviert."
-        )
+        log.info("PRUSA_TOKEN or PRUSA_FINGERPRINT not set – Prusa upload disabled.")
         return
 
     url = f"{PRUSA_BASE_URL.rstrip('/')}/c/snapshot"
+    # Prusa examples consistently show lowercase header names
     headers = {
-        "Token": PRUSA_TOKEN,
-        "Fingerprint": PRUSA_FINGERPRINT,
+        "content-type": "image/jpeg",
+        "token": PRUSA_TOKEN,
+        "fingerprint": PRUSA_FINGERPRINT,
     }
     sess = requests.Session()
 
-    log.info("Prusa-Pusher aktiv.")
+    log.info("Prusa pusher active (PUT raw JPEG).")
     while not stop_event.is_set():
         time.sleep(PUSH_EVERY)
         with _cap_lock:
@@ -161,16 +161,12 @@ def prusa_pusher_worker():
         if not data:
             continue
         try:
-            resp = sess.put(
-                url,
-                headers=headers,
-                files={"image": ("snapshot.jpg", data, "image/jpeg")},
-                timeout=10,
-            )
+            # IMPORTANT: raw bytes in the body (no multipart)
+            resp = sess.put(url, headers=headers, data=data, timeout=10)
             if resp.status_code >= 400:
-                log.warning(f"[prusa] HTTP {resp.status_code} – {resp.text[:200]}")
+                log.warning(f"[prusa] HTTP {resp.status_code}: {resp.text[:200]}")
             else:
-                log.debug("[prusa] Snapshot uploaded.")
+                log.debug("[prusa] snapshot uploaded")
         except Exception as e:
             log.warning(f"[prusa] upload failed: {e}")
 
