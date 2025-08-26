@@ -116,6 +116,8 @@ def grabber_worker():
                 time.sleep(0.5)
                 break
 
+            # Rotate image 180 degrees
+            frame = cv2.flip(frame, -1)
             try:
                 if (
                     WIDTH
